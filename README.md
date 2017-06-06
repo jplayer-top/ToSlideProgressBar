@@ -1,3 +1,5 @@
 # ToSlideProgressBar
-![](https://github.com/oblivion0001/ToSlideProgressBar/blob/master/ScreenGif.gif)
+---
+> 支持两边同时进行读条
+> 支持左边进行，右边进行
 ![](ScreenGif.gif)
