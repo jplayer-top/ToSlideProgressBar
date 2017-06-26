@@ -76,7 +76,7 @@ public class ToSlideProgressBar extends FrameLayout {
     }
 
     public void setRateWithAnim(int leftStart, int rightStart) {
-        resetTimer(leftStart/10);
+        resetTimer(leftStart / 10);
         mLlBar.setVisibility(VISIBLE);
         mLeftBar.setProgress(leftStart);
         mRightBar.setProgress(rightStart);
@@ -90,6 +90,9 @@ public class ToSlideProgressBar extends FrameLayout {
         times_total = ANIM_TIME / timespace_hanlder;//1500
         mTimer = new Timer();
         mTimer.schedule(new BarTimerTask(), 0, timespace_hanlder);
+        if (mListener != null) {
+            mListener.onStartProgress(this,mCurProgress);
+        }
     }
 
     public void resetTimer() {
@@ -134,11 +137,18 @@ public class ToSlideProgressBar extends FrameLayout {
 
     public void resumeView() {
         setRateWithAnim(mCurProgress, mCurProgress);
+        Log.e("Oblivion", "当前的resume" + mCurProgress);
+        if (mListener != null) {
+            mListener.onResumeProgress(mCurProgress);
+        }
     }
 
     public void pauseView() {
-        resetTimer();
-        Log.e("Oblivion", "当前的" + mCurProgress);
+        resetTimer(times_current);
+        Log.e("Oblivion", "当前的pause" + mCurProgress);
+        if (mListener != null) {
+            mListener.onPauseProgress(mCurProgress);
+        }
     }
 
     public void resetView() {
@@ -148,15 +158,11 @@ public class ToSlideProgressBar extends FrameLayout {
         setRateWithAnim();
     }
 
-    public void setOnProgresslistener(ProgressListener mListener) {
+    public void setOnProgresslistener(ToSlideBarListener mListener) {
         this.mListener = mListener;
     }
 
-    protected ProgressListener mListener;
-
-    public interface ProgressListener {
-        void onProgressListener(int progress);
-    }
+    protected ToSlideBarListener mListener;
 
     /**
      * 时间任务
@@ -173,12 +179,15 @@ public class ToSlideProgressBar extends FrameLayout {
                     mLeftBar.setProgress(mCurProgress);
                     mRightBar.setProgress((int) (times_current * rightspeed));
                     if (mListener != null) {
-                        mListener.onProgressListener(mCurProgress);
+                        mListener.onProgressing(mCurProgress);
                     }
                     if (times_current >= times_total) {
                         mLeftBar.setProgress((int) leftvalue);
                         mRightBar.setProgress((int) leftvalue);
                         resetTimer();
+                        if (mListener != null) {
+                            mListener.onEndProgress();
+                        }
                     }
                 }
             });

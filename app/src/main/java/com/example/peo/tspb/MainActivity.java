@@ -5,17 +5,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.example.library.ToSlideBarAdapter;
 import com.example.library.ToSlideProgressBar;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ToSlideProgressBar mTspb;
+    private MainActivity mActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mTspb = (ToSlideProgressBar) findViewById(R.id.toSlideProgressBar);
+        mActivity = this;
         LinearLayout layout = (LinearLayout) findViewById(R.id.menuLinearLayout);
         findViewById(R.id.button).setOnClickListener(this);
         findViewById(R.id.button2).setOnClickListener(this);
@@ -23,8 +26,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.button4).setOnClickListener(this);
         findViewById(R.id.button5).setOnClickListener(this);
         findViewById(R.id.button6).setOnClickListener(this);
+        mTspb.setOnProgresslistener(new ToSlideBarAdapter() {
+            @Override
+            public void onProgressing(int progress) {
+                ToastUtils.showQuckToast(mActivity, progress);
+            }
+        });
     }
-
 
     @Override
     public void onClick(View v) {
