@@ -76,7 +76,7 @@ public class ToSlideProgressBar extends FrameLayout {
     }
 
     public void setRateWithAnim(int leftStart, int rightStart) {
-        resetTimer();
+        resetTimer(leftStart/10);
         mLlBar.setVisibility(VISIBLE);
         mLeftBar.setProgress(leftStart);
         mRightBar.setProgress(rightStart);
@@ -93,11 +93,15 @@ public class ToSlideProgressBar extends FrameLayout {
     }
 
     public void resetTimer() {
+        this.resetTimer(0);
+    }
+
+    public void resetTimer(int curTime) {
         if (mTimer != null) {
             mTimer.cancel();
             mTimer.purge();
             mTimer = null;
-            times_current = 0;
+            times_current = curTime;
         }
     }
 
