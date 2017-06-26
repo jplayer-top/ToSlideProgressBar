@@ -1,6 +1,8 @@
 package com.example.library;
 
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -30,6 +32,9 @@ public class ToSlideProgressBar extends FrameLayout {
     private LinearLayout mLlBar;
     private ProgressBar mLeftBar;
     private ProgressBar mRightBar;
+    private int mColor;
+    private int mMax;
+    private int mCurProgress;
 
     public ToSlideProgressBar(@NonNull Context context) {
         super(context);
@@ -38,6 +43,10 @@ public class ToSlideProgressBar extends FrameLayout {
 
     public ToSlideProgressBar(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.to_slide_bar);//TypedArray是一个数组容器
+        mColor = a.getColor(R.styleable.to_slide_bar_bar_color, Color.BLUE);
+        mMax = a.getInteger(R.styleable.to_slide_bar_bar_max, 15000);
+        a.recycle();
         init(context);
     }
 
@@ -45,7 +54,10 @@ public class ToSlideProgressBar extends FrameLayout {
         View view = View.inflate(context, R.layout.view_to_slide_progressbar, null);
         mLeftBar = (ProgressBar) view.findViewById(R.id.progress_left);
         mRightBar = (ProgressBar) view.findViewById(R.id.progress_right);
+        mLeftBar.setMax(mMax / 10);
+        mRightBar.setMax(mMax / 10);
         mLlBar = (LinearLayout) view.findViewById(R.id.llBar);
+        ANIM_TIME = mMax;
         this.removeAllViews();
         this.addView(view);
     }
@@ -54,19 +66,23 @@ public class ToSlideProgressBar extends FrameLayout {
      * 设置滚动条动画
      */
     protected int timespace_hanlder = 100;
-    private static final int ANIM_TIME = 15000;
+    private int ANIM_TIME;
 
     /**
      * 开启动画
      */
     public void setRateWithAnim() {
+        this.setRateWithAnim(0, 0);
+    }
+
+    public void setRateWithAnim(int leftStart, int rightStart) {
         resetTimer();
         mLlBar.setVisibility(VISIBLE);
-        mLeftBar.setProgress(0);
-        mRightBar.setProgress(0);
+        mLeftBar.setProgress(leftStart);
+        mRightBar.setProgress(rightStart);
 
-        leftvalue = 1500;
-        rightvalue = 1500;
+        leftvalue = mMax / 10;
+        rightvalue = mMax / 10;
 
         leftspeed = leftvalue / ANIM_TIME * timespace_hanlder;//
         rightspeed = rightvalue / ANIM_TIME * timespace_hanlder;
@@ -112,11 +128,30 @@ public class ToSlideProgressBar extends FrameLayout {
         setRateWithAnim();
     }
 
+    public void resumeView() {
+        setRateWithAnim(mCurProgress, mCurProgress);
+    }
+
+    public void pauseView() {
+        resetTimer();
+        Log.e("Oblivion", "当前的" + mCurProgress);
+    }
+
     public void resetView() {
         resetTimer();
         mLeftBar.setVisibility(VISIBLE);
         mRightBar.setVisibility(VISIBLE);
         setRateWithAnim();
+    }
+
+    public void setOnProgresslistener(ProgressListener mListener) {
+        this.mListener = mListener;
+    }
+
+    protected ProgressListener mListener;
+
+    public interface ProgressListener {
+        void onProgressListener(int progress);
     }
 
     /**
@@ -129,9 +164,13 @@ public class ToSlideProgressBar extends FrameLayout {
                 @Override
                 public void run() {
                     times_current++;
-                    Log.e("obl", times_current + "   " + (int) (times_current * leftspeed));
-                    mLeftBar.setProgress((int) (times_current * leftspeed));
+                    mCurProgress = (int) (times_current * leftspeed);
+                    Log.e("obl", times_current + "   " + mCurProgress);
+                    mLeftBar.setProgress(mCurProgress);
                     mRightBar.setProgress((int) (times_current * rightspeed));
+                    if (mListener != null) {
+                        mListener.onProgressListener(mCurProgress);
+                    }
                     if (times_current >= times_total) {
                         mLeftBar.setProgress((int) leftvalue);
                         mRightBar.setProgress((int) leftvalue);

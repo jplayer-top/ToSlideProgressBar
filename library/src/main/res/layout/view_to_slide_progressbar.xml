@@ -12,7 +12,6 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:max="1500"
         android:progress="0"
         android:progressDrawable="@drawable/custom_bar_clip_left"/>
 
@@ -22,7 +21,6 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:max="1500"
         android:progress="0"
         android:progressDrawable="@drawable/custom_bar_clip_right"/>
 </LinearLayout>
